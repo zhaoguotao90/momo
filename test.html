@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>飞鹰武士 - 手机优化版</title>
+    <title>飞鹰武士 - GitHub Pages 修复版</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -16,317 +16,237 @@
             min-height: 100vh; 
             padding: 20px; 
         }
-        
         .container { 
             width: 100%; 
             max-width: 600px; 
-            background: rgba(0,0,0,0.7); 
+            background: rgba(0,0,0,0.8); 
             border-radius: 15px; 
             padding: 20px; 
             text-align: center; 
         }
-        
         h1 { 
             color: #ffcc00; 
-            margin-bottom: 10px; 
+            margin: 15px 0; 
+            font-size: 24px; 
         }
-        
         .game-box { 
             width: 100%; 
-            height: 400px; 
+            height: 350px; 
             background: #000; 
             border-radius: 10px; 
             margin: 20px 0; 
             position: relative; 
             overflow: hidden; 
+            border: 2px solid #444; 
         }
-        
-        #game-frame { 
+        #ruffle-container { 
             width: 100%; 
             height: 100%; 
         }
-        
-        .loading { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; 
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background: #111; 
+        .status { 
+            background: rgba(0,0,0,0.5); 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin: 10px 0; 
+            font-size: 14px; 
         }
-        
-        .spinner { 
-            width: 40px; 
-            height: 40px; 
-            border: 5px solid rgba(255,255,255,0.1); 
-            border-top: 5px solid #ffcc00; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 20px; 
-        }
-        
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
-        }
-        
-        .error { 
-            position: absolute; 
-            top: 0; left: 0; 
-            width: 100%; 
-            height: 100%; 
-            display: none; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            background: rgba(0,0,0,0.9); 
-            padding: 20px; 
-        }
-        
-        .buttons { 
-            display: flex; 
-            gap: 10px; 
-            justify-content: center; 
-            margin-top: 20px; 
-        }
-        
         button { 
-            padding: 12px 20px; 
+            padding: 12px 25px; 
+            background: #ffcc00; 
+            color: #000; 
             border: none; 
             border-radius: 8px; 
             font-weight: bold; 
             cursor: pointer; 
+            margin: 5px; 
         }
-        
-        .btn-retry { 
-            background: #ffcc00; 
-            color: #000; 
+        .error { 
+            background: rgba(231, 76, 60, 0.2); 
+            border: 1px solid #e74c3c; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin: 15px 0; 
+            display: none; 
         }
-        
-        .btn-change { 
-            background: #3498db; 
-            color: white; 
-        }
-        
-        .tips { 
-            margin-top: 20px; 
+        .debug { 
+            background: rgba(52, 152, 219, 0.1); 
+            padding: 10px; 
+            border-radius: 5px; 
             font-size: 12px; 
-            color: #ccc; 
+            margin-top: 15px; 
+            text-align: left; 
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>经典Flash动作游戏 - 优化加载版</h1>
+        <h1>飞鹰武士 - GitHub Pages 修复版</h1>
+        <p>专为 GitHub Pages 部署优化</p>
+        
+        <div class="status" id="status">状态: 初始化中...</div>
+        
         <div class="game-box">
-            <div id="game-frame">
-                <!-- 游戏将加载在这里 -->
-            </div>
-            
-            <div class="loading" id="loading">
-                <div class="spinner"></div>
-                <p id="loading-text">正在加载游戏，请稍候...</p>
-            </div>
-            
-            <div class="error" id="error-box">
-                <h3>加载错误</h3>
-                <p id="error-message">错误信息将显示在这里</p>
-                <div class="buttons">
-                    <button class="btn-retry" onclick="retryGame()">重试加载</button>
-                    <button class="btn-change" onclick="changeRuffle()">更换模拟器版本</button>
-                </div>
+            <div id="ruffle-container">
+                <!-- Ruffle将在此加载游戏 -->
             </div>
         </div>
         
-        <div class="buttons">
-            <button class="btn-retry" onclick="startGame()">开始游戏</button>
+        <div class="error" id="error-box">
+            <h3>⚠️ 文件加载错误</h3>
+            <p id="error-message"></p>
+            <div style="margin-top: 15px;">
+                <button onclick="retryLoad()">重新加载</button>
+            </div>
         </div>
         
-        <div class="tips">
-            提示：如遇到加载问题，请使用Chrome浏览器访问
+        <button onclick="startGame()" id="start-btn" disabled>开始游戏</button>
+        
+        <div class="debug" id="debug-info">
+            <strong>调试信息：</strong><br>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #ccc;">
+            <p>部署成功后访问地址：https://zhaoguotao90.github.io/momo/</p>
+            <p>注意：第一次部署后可能需要等待 1-5 分钟生效</p>
         </div>
     </div>
 
+    <!-- 使用稳定的 Ruffle CDN -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2025.3.1/ruffle.js"></script>
+    
     <script>
-        // 等待页面完全加载后再执行
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log("页面加载完成，开始初始化游戏...");
-            initializeGame();
-        });
-        
-        let rufflePlayer = null;
-        let isRuffleLoaded = false;
-        
-        // 安全的DOM元素获取函数
-        function getElement(id) {
-            const element = document.getElementById(id);
-            if (!element) {
-                console.error(`错误：找不到ID为"${id}"的元素`);
-                return null;
-            }
-            return element;
-        }
-        
-        // 安全的文本设置函数
-        function setText(id, text) {
-            const element = getElement(id);
-            if (element) {
-                element.textContent = text;
+        let ruffle = null;
+        let player = null;
+        const repoName = "momo"; // 你的仓库名
+        const swfFileName = "feiyingwushi.swf";
+
+        // 自动适配 GitHub Pages 路径
+        function getSWFPath() {
+            // 如果是本地打开，用相对路径；如果是 GitHub Pages，用仓库根目录路径
+            const isGitHubPages = window.location.hostname.includes("github.io");
+            if (isGitHubPages) {
+                // 你的部署地址是 https://zhaoguotao90.github.io/momo/
+                return `/${repoName}/${swfFileName}`;
+            } else {
+                // 本地测试用相对路径
+                return swfFileName;
             }
         }
-        
-        // 显示/隐藏元素函数
-        function showElement(id) {
-            const element = getElement(id);
-            if (element) element.style.display = 'flex';
+
+        // 更新状态
+        function updateStatus(text) {
+            const statusEl = document.getElementById('status');
+            if (statusEl) statusEl.textContent = `状态: ${text}`;
+            console.log(`状态: ${text}`);
         }
-        
-        function hideElement(id) {
-            const element = getElement(id);
-            if (element) element.style.display = 'none';
+
+        // 显示错误
+        function showError(message) {
+            const errorBox = document.getElementById('error-box');
+            const errorMsg = document.getElementById('error-message');
+            if (errorBox) errorBox.style.display = 'block';
+            if (errorMsg) errorMsg.textContent = message;
+            updateStatus(`错误: ${message}`);
         }
-        
-        async function initializeGame() {
-            try {
-                console.log("初始化Ruffle模拟器...");
-                setText('loading-text', '正在加载Ruffle模拟器...');
-                
-                // 使用更稳定的Ruffle版本
-                await loadRuffleScript('https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.10.31/ruffle.js');
-                
-                console.log("Ruffle加载成功，创建播放器...");
-                setText('loading-text', '创建游戏播放器...');
-                
-                if (typeof window.RufflePlayer === 'undefined') {
-                    throw new Error('Ruffle模拟器加载失败');
-                }
-                
-                const ruffle = window.RufflePlayer.newest();
-                rufflePlayer = ruffle.createPlayer();
-                
-                const gameFrame = getElement('game-frame');
-                if (!gameFrame) {
-                    throw new Error('找不到游戏容器');
-                }
-                
-                // 清空游戏容器
-                gameFrame.innerHTML = '';
-                gameFrame.appendChild(rufflePlayer);
-                
-                rufflePlayer.style.width = '100%';
-                rufflePlayer.style.height = '100%';
-                
-                console.log("开始加载游戏文件...");
-                setText('loading-text', '正在加载游戏文件...');
-                
-                // 尝试多个可能的文件路径
-                await loadGame();
-                
-            } catch (error) {
-                console.error("初始化失败:", error);
-                showError(`播放器创建失败: ${error.message}`);
-            }
+
+        // 隐藏错误
+        function hideError() {
+            const errorBox = document.getElementById('error-box');
+            if (errorBox) errorBox.style.display = 'none';
         }
-        
-        function loadRuffleScript(url) {
-            return new Promise((resolve, reject) => {
-                console.log(`正在加载脚本: ${url}`);
-                const script = document.createElement('script');
-                script.src = url;
-                script.onload = () => {
-                    console.log("Ruffle脚本加载成功");
-                    isRuffleLoaded = true;
-                    resolve();
-                };
-                script.onerror = () => {
-                    console.error(`脚本加载失败: ${url}`);
-                    reject(new Error(`无法加载Ruffle模拟器`));
-                };
-                document.head.appendChild(script);
-            });
-        }
-        
+
+        // 加载游戏（直接用 Ruffle 加载，不做跨域 fetch 检查）
         async function loadGame() {
-            if (!rufflePlayer) {
-                showError('游戏播放器未创建');
-                return;
-            }
-            
-            const gameFiles = [
-                'feiyingwushi.swf',
-                './feiyingwushi.swf',
-                'https://raw.githubusercontent.com/zhaoguotao90/momo/main/feiyingwushi.swf'
-            ];
-            
-            for (let i = 0; i < gameFiles.length; i++) {
-                try {
-                    setText('loading-text', `尝试加载: ${gameFiles[i]}`);
-                    console.log(`尝试加载游戏文件: ${gameFiles[i]}`);
-                    
-                    await rufflePlayer.load(gameFiles[i]);
-                    
-                    console.log("游戏加载成功");
-                    hideElement('loading');
-                    isRuffleLoaded = true;
+            const swfPath = getSWFPath();
+            updateStatus(`正在加载: ${swfPath}`);
+            document.getElementById('debug-info').innerHTML += `<div>尝试加载路径: ${swfPath}</div>`;
+
+            // 初始化 Ruffle
+            if (!ruffle) {
+                if (typeof window.RufflePlayer === 'undefined') {
+                    showError('Ruffle 模拟器加载失败，请检查网络');
                     return;
-                    
-                } catch (error) {
-                    console.warn(`加载失败 ${gameFiles[i]}:`, error);
-                    if (i === gameFiles.length - 1) {
-                        showError('所有文件加载失败，请检查网络连接');
-                    }
+                }
+                ruffle = window.RufflePlayer.newest();
+            }
+
+            // 创建播放器
+            if (!player) {
+                player = ruffle.createPlayer();
+                const container = document.getElementById('ruffle-container');
+                if (container) {
+                    container.innerHTML = '';
+                    container.appendChild(player);
+                    player.style.width = '100%';
+                    player.style.height = '100%';
                 }
             }
+
+            // 加载 SWF 文件
+            try {
+                await player.load(swfPath);
+                updateStatus('游戏加载成功！');
+                document.getElementById('start-btn').disabled = false;
+                hideError();
+                document.getElementById('debug-info').innerHTML += `<div style="color: green;">✓ 加载成功！</div>`;
+            } catch (error) {
+                showError(`加载失败: ${error.message}`);
+                document.getElementById('debug-info').innerHTML += `<div style="color: red;">✗ 加载失败: ${error.message}</div>`;
+            }
         }
-        
+
+        // 开始游戏
         function startGame() {
-            if (rufflePlayer && isRuffleLoaded) {
+            if (player) {
                 try {
-                    rufflePlayer.play();
+                    player.play();
+                    updateStatus('游戏中...');
                 } catch (error) {
-                    showError(`无法启动游戏: ${error.message}`);
+                    showError(`启动失败: ${error.message}`);
                 }
             } else {
-                showError('游戏尚未加载完成，请稍候');
+                showError('游戏未加载，请先等待加载完成');
             }
         }
-        
-        function retryGame() {
-            console.log("重试加载游戏...");
-            hideElement('error-box');
-            showElement('loading');
-            setText('loading-text', '正在重新加载...');
-            
+
+        // 重新加载
+        function retryLoad() {
+            hideError();
+            updateStatus('重新加载中...');
+            document.getElementById('debug-info').innerHTML = '<strong>调试信息：</strong><br>';
+            loadGame();
+        }
+
+        // 页面加载完成
+        window.addEventListener('DOMContentLoaded', function() {
+            updateStatus('正在初始化...');
+
+            // 等待 Ruffle 加载
+            const checkRuffle = setInterval(() => {
+                if (typeof window.RufflePlayer !== 'undefined') {
+                    clearInterval(checkRuffle);
+                    updateStatus('Ruffle 加载成功');
+                    loadGame();
+                }
+            }, 100);
+
+            // 超时处理
             setTimeout(() => {
-                initializeGame();
-            }, 1000);
-        }
-        
-        function changeRuffle() {
-            console.log("更换Ruffle版本...");
-            setText('loading-text', '正在更换模拟器版本...');
-            hideElement('error-box');
-            showElement('loading');
-            
-            // 移除旧的Ruffle脚本
-            const oldScripts = document.querySelectorAll('script[src*="ruffle"]');
-            oldScripts.forEach(script => script.remove());
-            
-            // 重新加载
-            setTimeout(() => {
-                initializeGame();
-            }, 1000);
-        }
-        
-        function showError(message) {
-            console.error("显示错误:", message);
-            setText('error-message', message);
-            hideElement('loading');
-            showElement('error-box');
-        }
+                if (typeof window.RufflePlayer === 'undefined') {
+                    showError('Ruffle 模拟器加载超时，请检查网络或更换浏览器');
+                }
+            }, 8000);
+        });
+
+        // 快捷键
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ') {
+                e.preventDefault();
+                startGame();
+            } else if (e.key === 'r' || e.key === 'R') {
+                retryLoad();
+            }
+        });
     </script>
 </body>
 </html>
