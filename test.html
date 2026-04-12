@@ -2,387 +2,324 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>拳皇KOF7K - Base64分块加载版</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞鹰武士 - Flash游戏测试</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #000; 
-            color: #fff; 
-            font-family: "Microsoft Yahei", sans-serif; 
-            overflow: hidden; 
-            touch-action: none; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
         }
         
-        .header { 
-            padding: 15px; 
-            text-align: center; 
-            background: linear-gradient(135deg, #8B0000, #B22222); 
-            border-bottom: 3px solid #ffcc00; 
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
-        .title { 
-            font-size: 2.5rem; 
-            color: #ffcc00; 
-            margin-bottom: 5px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
         }
         
-        .subtitle { 
-            color: #4cdfff; 
-            font-size: 1.2rem; 
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ffcc00;
         }
         
-        #game-container { 
-            flex: 1; 
-            width: 100%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            position: relative; 
+        h1 {
+            font-size: 3rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            margin-bottom: 10px;
+            letter-spacing: 3px;
         }
         
-        #loading-overlay { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: rgba(0, 0, 0, 0.95); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-top: 10px;
         }
         
-        .loader { 
-            width: 50px; 
-            height: 50px; 
-            border: 5px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 50%; 
-            border-top: 5px solid #ff3333; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 20px; 
+        .game-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border: 5px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         }
         
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
+        #game-frame {
+            width: 100%;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
         }
         
-        #loading-text { 
-            color: #fff; 
-            font-size: 1.2rem; 
-            text-align: center; 
-            margin-bottom: 20px; 
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
         
-        #progress-bar { 
-            width: 80%; 
-            height: 6px; 
-            background: #333; 
-            border-radius: 3px; 
-            overflow: hidden; 
-            margin: 20px 0; 
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        #progress-fill { 
-            height: 100%; 
-            width: 0%; 
-            background: linear-gradient(90deg, #52c41a, #a0d911); 
-            transition: width 0.3s; 
+        .btn:hover {
+            background: linear-gradient(to bottom, #ffdd33, #ffaa33);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         
-        #error-message { 
-            display: none; 
-            background: rgba(200, 0, 0, 0.7); 
-            padding: 15px; 
-            border-radius: 5px; 
-            margin-top: 15px; 
-            text-align: center; 
-            max-width: 80%; 
+        .btn:active {
+            transform: translateY(1px);
         }
         
-        .controls { 
-            padding: 10px; 
-            display: flex; 
-            justify-content: center; 
-            gap: 10px; 
-            background: rgba(0, 0, 0, 0.8); 
-            border-top: 1px solid #333; 
+        .instructions {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #ffcc00;
         }
         
-        .control-btn { 
-            background: linear-gradient(to bottom, #444, #222); 
-            color: #fff; 
-            border: none; 
-            border-radius: 4px; 
-            padding: 8px 15px; 
-            font-size: 0.9rem; 
-            cursor: pointer; 
-            transition: all 0.2s; 
+        .instructions h2 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
         }
         
-        .control-btn:hover { 
-            background: linear-gradient(to bottom, #555, #333); 
+        .instructions ul {
+            padding-left: 20px;
+            margin: 15px 0;
         }
         
-        #reward-video { 
-            display: none; 
-            width: 100%; 
-            height: 100%; 
-            object-fit: contain; 
-            background: #000; 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            z-index: 999; 
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
         
-        #close-btn { 
-            position: fixed; 
-            top: 20px; 
-            right: 20px; 
-            z-index: 1000; 
-            background: #ff4444; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            display: none; 
+        .key {
+            display: inline-block;
+            background: #333;
+            color: #ffcc00;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 0 3px;
+            border: 1px solid #555;
+        }
+        
+        .status {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        
+        .status-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .status-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-top: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            #game-frame {
+                height: 400px;
+            }
+            
+            .status {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            #game-frame {
+                height: 300px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 class="title">拳皇KOF7K 终极版</h1>
-        <p class="subtitle">Base64分块加载技术 - 完美解决部署限制</p>
-    </div>
-    
-    <div id="game-container">
-        <div id="loading-overlay">
-            <div class="loader"></div>
-            <div id="loading-text">正在初始化游戏引擎...</div>
-            <div id="progress-bar">
-                <div id="progress-fill"></div>
+    <div class="container">
+        <header>
+            <h1>飞鹰武士</h1>
+            <p class="subtitle">经典Flash动作游戏 - 使用Ruffle模拟器运行</p>
+        </header>
+        
+        <div class="game-container">
+            <div id="game-frame">
+                <!-- 游戏将在这里加载 -->
             </div>
-            <div id="error-message"></div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="start-btn">开始游戏</button>
+            <button class="btn" id="fullscreen-btn">全屏模式</button>
+            <button class="btn" id="restart-btn">重新开始</button>
+        </div>
+        
+        <div class="instructions">
+            <h2>游戏说明</h2>
+            <p>《飞鹰武士》是一款经典的横向卷轴动作游戏，玩家扮演一名身手矫健的武士，在充满挑战的关卡中击败敌人。</p>
+            
+            <h3>操作方式：</h3>
+            <ul>
+                <li>移动：<span class="key">←</span> <span class="key">→</span> 方向键</li>
+                <li>跳跃：<span class="key">↑</span> 方向键或 <span class="key">空格键</span></li>
+                <li>攻击：<span class="key">Z</span> 键或 <span class="key">X</span> 键</li>
+                <li>特殊技能：<span class="key">C</span> 键</li>
+                <li>暂停游戏：<span class="key">P</span> 键</li>
+            </ul>
+            
+            <h3>游戏提示：</h3>
+            <ul>
+                <li>收集关卡中的能量道具增强能力</li>
+                <li>注意躲避陷阱和敌人攻击</li>
+                <li>击败Boss需要找到其弱点</li>
+                <li>每关都有隐藏区域和奖励</li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <div class="status-item">
+                <div>游戏状态</div>
+                <div class="status-value" id="game-status">准备中</div>
+            </div>
+            <div class="status-item">
+                <div>模拟器版本</div>
+                <div class="status-value" id="ruffle-version">加载中...</div>
+            </div>
+            <div class="status-item">
+                <div>兼容性</div>
+                <div class="status-value" id="compatibility">检测中...</div>
+            </div>
         </div>
     </div>
     
-    <div class="controls">
-        <button class="control-btn" id="reload-btn">🔄 重新加载</button>
-        <button class="control-btn" id="volume-btn">🔊 音量开关</button>
-    </div>
-    
-    <video id="reward-video" controls playsinline>
-        <source src="reward_video.mp4" type="video/mp4">
-    </video>
-    
-    <button id="close-btn">返回游戏</button>
+    <footer>
+        <p>© 2023 飞鹰武士游戏测试页面 | 使用Ruffle模拟器运行Flash内容</p>
+        <p>注意：此页面仅用于测试目的，游戏版权归原作者所有</p>
+    </footer>
 
-    <script src="ruffle.js"></script>
+    <!-- 引入Ruffle模拟器 -->
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    
     <script>
-        // 配置
-        const TOTAL_PARTS = 11; // 修改为实际分块数量
-        const GAME_WIDTH = 800;
-        const GAME_HEIGHT = 600;
-        
-        // DOM元素
-        const gameContainer = document.getElementById('game-container');
-        const loadingOverlay = document.getElementById('loading-overlay');
-        const loadingText = document.getElementById('loading-text');
-        const progressBar = document.getElementById('progress-fill');
-        const errorMessage = document.getElementById('error-message');
-        const reloadBtn = document.getElementById('reload-btn');
-        const volumeBtn = document.getElementById('volume-btn');
-        const rewardVideo = document.getElementById('reward-video');
-        const closeBtn = document.getElementById('close-btn');
-        
-        let rufflePlayer = null;
-        let isMuted = false;
-        
-        // 更新进度
-        function updateProgress(percent, message) {
-            progressBar.style.width = percent + '%';
-            if (message) {
-                loadingText.textContent = `${message} (${Math.round(percent)}%)`;
-            }
-        }
-        
-        // 加载分块文件
-        async function loadGameParts() {
-            let base64Data = '';
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初始化Ruffle
+            const ruffle = window.RufflePlayer.newest();
+            const player = ruffle.createPlayer();
+            const gameContainer = document.getElementById('game-frame');
             
-            for (let i = 1; i <= TOTAL_PARTS; i++) {
-                try {
-                    updateProgress(((i - 1) / TOTAL_PARTS) * 100, `正在加载分块 ${i}/${TOTAL_PARTS}`);
-                    
-                    const response = await fetch(`game_part_${i}.b64`);
-                    if (!response.ok) {
-                        throw new Error(`无法加载分块 ${i}: ${response.statusText}`);
-                    }
-                    
-                    const text = await response.text();
-                    base64Data += text;
-                    
-                } catch (error) {
-                    throw new Error(`分块 ${i} 加载失败: ${error.message}`);
-                }
-            }
+            player.style.width = '100%';
+            player.style.height = '100%';
+            gameContainer.appendChild(player);
             
-            return base64Data;
-        }
-        
-        // Base64转Uint8Array
-        function base64ToUint8Array(base64) {
-            try {
-                const binaryString = atob(base64);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
-                return bytes;
-            } catch (error) {
-                throw new Error('Base64解码失败: ' + error.message);
-            }
-        }
-        
-        // 主加载函数
-        async function loadGame() {
-            try {
-                // 阶段1: 加载Ruffle
-                updateProgress(10, '正在加载Flash播放器');
-                
-                if (!window.RufflePlayer) {
-                    throw new Error('Ruffle播放器加载失败');
-                }
-                
-                // 阶段2: 加载分块文件
-                updateProgress(20, '开始加载游戏分块');
-                const base64Data = await loadGameParts();
-                updateProgress(70, '游戏分块加载完成');
-                
-                // 阶段3: 解码Base64
-                updateProgress(80, '正在解码游戏数据');
-                const uint8Array = base64ToUint8Array(base64Data);
-                
-                // 阶段4: 初始化Ruffle播放器
-                updateProgress(90, '正在初始化游戏');
-                
-                const ruffle = window.RufflePlayer.newest();
-                rufflePlayer = ruffle.createPlayer();
-                
-                // 设置播放器样式
-                rufflePlayer.style.width = '100%';
-                rufflePlayer.style.height = '100%';
-                rufflePlayer.style.maxWidth = `${GAME_WIDTH}px`;
-                rufflePlayer.style.maxHeight = `${GAME_HEIGHT}px`;
-                rufflePlayer.style.margin = '0 auto';
-                
-                // 清空容器并添加播放器
-                gameContainer.innerHTML = '';
-                gameContainer.appendChild(rufflePlayer);
-                
-                // 阶段5: 加载游戏
-                await rufflePlayer.load({
-                    data: uint8Array.buffer,
-                    autoplay: 'on',
-                    unmuteOverlay: 'visible',
-                    backgroundColor: '#000000',
-                    wmode: 'direct',
-                    letterbox: 'on',
-                    openInNewTab: false
-                });
-                
-                // 阶段6: 加载完成
-                updateProgress(100, '游戏加载完成');
-                
-                // 淡出加载界面
-                setTimeout(() => {
-                    loadingOverlay.style.opacity = '0';
-                    setTimeout(() => {
-                        loadingOverlay.style.display = 'none';
-                    }, 500);
-                }, 1000);
-                
-                console.log('游戏加载成功！');
-                
-            } catch (error) {
-                console.error('加载失败:', error);
-                showError(error.message);
-            }
-        }
-        
-        // 显示错误
-        function showError(message) {
-            loadingText.textContent = '加载失败';
-            errorMessage.textContent = `错误: ${message}`;
-            errorMessage.style.display = 'block';
-            reloadBtn.style.display = 'inline-block';
-        }
-        
-        // 显示通关视频
-        function showRewardVideo() {
-            gameContainer.style.display = 'none';
-            rewardVideo.style.display = 'block';
-            closeBtn.style.display = 'block';
-            rewardVideo.play().catch(e => {
-                console.log('视频自动播放失败，需要用户交互');
+            // 加载游戏
+            player.load('feiyingwushi.swf').then(() => {
+                document.getElementById('game-status').textContent = '已加载';
+                document.getElementById('compatibility').textContent = '良好';
+            }).catch(e => {
+                console.error('游戏加载失败:', e);
+                document.getElementById('game-status').textContent = '加载失败';
+                document.getElementById('compatibility').textContent = '有问题';
             });
-        }
-        
-        // 返回游戏
-        function backToGame() {
-            rewardVideo.style.display = 'none';
-            closeBtn.style.display = 'none';
-            rewardVideo.pause();
-            gameContainer.style.display = 'flex';
-        }
-        
-        // 切换音量
-        function toggleVolume() {
-            isMuted = !isMuted;
-            if (rufflePlayer) {
-                rufflePlayer.muted = isMuted;
-            }
-            volumeBtn.textContent = isMuted ? '🔇 取消静音' : '🔊 静音';
-        }
-        
-        // 事件监听
-        reloadBtn.addEventListener('click', () => {
-            loadingOverlay.style.display = 'flex';
-            loadingOverlay.style.opacity = '1';
-            errorMessage.style.display = 'none';
-            loadGame();
-        });
-        
-        volumeBtn.addEventListener('click', toggleVolume);
-        closeBtn.addEventListener('click', backToGame);
-        
-        // 键盘快捷键
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && rewardVideo.style.display === 'block') {
-                backToGame();
-            }
-            if (e.key === ' ' && rufflePlayer) {
-                // 空格键测试通关视频
-                showRewardVideo();
-            }
-        });
-        
-        // 页面加载完成后开始
-        window.addEventListener('DOMContentLoaded', loadGame);
-        
-        // 错误处理
-        window.addEventListener('error', (event) => {
-            console.error('全局错误:', event.error);
-            showError(event.error?.message || '未知错误');
+            
+            // 设置Ruffle版本显示
+            document.getElementById('ruffle-version').textContent = ruffle.version;
+            
+            // 按钮事件
+            document.getElementById('start-btn').addEventListener('click', () => {
+                player.play();
+                document.getElementById('game-status').textContent = '运行中';
+            });
+            
+            document.getElementById('restart-btn').addEventListener('click', () => {
+                player.restart();
+                document.getElementById('game-status').textContent = '重新开始';
+            });
+            
+            document.getElementById('fullscreen-btn').addEventListener('click', () => {
+                player.fullscreen();
+            });
+            
+            // 键盘快捷键
+            document.addEventListener('keydown', (e) => {
+                if (e.key === ' ') {
+                    player.play();
+                    document.getElementById('game-status').textContent = '运行中';
+                } else if (e.key === 'r' || e.key === 'R') {
+                    player.restart();
+                    document.getElementById('game-status').textContent = '重新开始';
+                } else if (e.key === 'f' || e.key === 'F') {
+                    player.fullscreen();
+                }
+            });
         });
     </script>
 </body>
