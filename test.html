@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>飞鹰武士 - 增强版阿里云OSS部署</title>
+    <title>飞鹰武士 - GitHub Pages版</title>
     <style>
         * {
             margin: 0;
@@ -16,13 +16,12 @@
             background: linear-gradient(135deg, #0a1a2a, #1a2a3a);
             color: white;
             min-height: 100vh;
-            overflow-x: hidden;
+            padding: 20px;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px;
         }
         
         .header {
@@ -36,7 +35,7 @@
         }
         
         .title {
-            font-size: 3.2em;
+            font-size: 2.8em;
             background: linear-gradient(45deg, #4fc3f7, #29b6f6);
             -webkit-background-clip: text;
             background-clip: text;
@@ -47,8 +46,7 @@
         
         .subtitle {
             color: #a8e6ff;
-            font-size: 1.6em;
-            letter-spacing: 1px;
+            font-size: 1.4em;
         }
         
         .game-container {
@@ -58,11 +56,12 @@
             margin-bottom: 25px;
             border: 3px solid #4fc3f7;
             box-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+            height: 600px;
         }
         
         #gameScreen {
             width: 100%;
-            height: 550px;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -111,15 +110,15 @@
         
         .game-btn {
             display: inline-block;
-            padding: 16px 35px;
+            padding: 14px 30px;
             background: linear-gradient(135deg, #1890ff, #096dd9);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 1.2em;
+            font-size: 1.1em;
             font-weight: bold;
             cursor: pointer;
-            min-width: 200px;
+            min-width: 180px;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
@@ -139,7 +138,7 @@
             margin: 25px 0;
             color: #a8e6ff;
             min-height: 28px;
-            font-size: 1.2em;
+            font-size: 1.1em;
         }
         
         .footer {
@@ -148,49 +147,7 @@
             padding-top: 25px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             color: #a8e6ff;
-            font-size: 1.1em;
-        }
-        
-        .game-info {
-            background: rgba(0, 30, 60, 0.6);
-            border-radius: 10px;
-            padding: 20px;
-            margin: 25px auto;
-            max-width: 800px;
-            text-align: center;
-        }
-        
-        .game-info h3 {
-            color: #4fc3f7;
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-        
-        .game-info p {
-            line-height: 1.6;
-            margin-bottom: 15px;
-            font-size: 1.1em;
-        }
-        
-        .features {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 20px;
-        }
-        
-        .feature {
-            background: rgba(79, 195, 247, 0.15);
-            border-radius: 10px;
-            padding: 15px;
-            width: 200px;
-        }
-        
-        .feature-icon {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            color: #4fc3f7;
+            font-size: 1em;
         }
         
         /* 加载动画 */
@@ -238,41 +195,41 @@
         /* 响应式设计 */
         @media (max-width: 768px) {
             .title {
-                font-size: 2.5em;
+                font-size: 2.2em;
             }
             
             .subtitle {
-                font-size: 1.3em;
+                font-size: 1.2em;
             }
             
-            #gameScreen {
-                height: 400px;
+            .game-container {
+                height: 450px;
             }
             
             .game-btn {
-                padding: 14px 25px;
+                padding: 12px 25px;
                 min-width: 160px;
-                font-size: 1.1em;
+                font-size: 1em;
             }
         }
         
         @media (max-width: 480px) {
             .title {
-                font-size: 2em;
+                font-size: 1.8em;
             }
             
             .subtitle {
-                font-size: 1.1em;
+                font-size: 1em;
             }
             
-            #gameScreen {
-                height: 300px;
+            .game-container {
+                height: 350px;
             }
             
             .game-btn {
-                padding: 12px 20px;
+                padding: 10px 20px;
                 min-width: 140px;
-                font-size: 1em;
+                font-size: 0.9em;
             }
         }
     </style>
@@ -281,30 +238,7 @@
     <div class="container">
         <div class="header">
             <h1 class="title">飞鹰武士</h1>
-            <p class="subtitle">经典Flash游戏 - 增强版阿里云OSS部署</p>
-        </div>
-        
-        <div class="game-info">
-            <h3>游戏简介</h3>
-            <p>《飞鹰武士》是一款经典的Flash动作游戏，玩家将扮演一名武士，在神秘的东方世界中冒险。游戏拥有精美的画面、流畅的动作和丰富的关卡设计。</p>
-            
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon">⚔️</div>
-                    <h4>炫酷战斗</h4>
-                    <p>流畅的连招系统</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🏯</div>
-                    <h4>精美场景</h4>
-                    <p>东方风格关卡设计</p>
-                </div>
-                <div class="feature">
-                    <div class="feature-icon">🎮</div>
-                    <h4>简单操作</h4>
-                    <p>易于上手的控制</p>
-                </div>
-            </div>
+            <p class="subtitle">经典Flash游戏 - GitHub Pages部署版</p>
         </div>
         
         <div class="status-info">
@@ -331,10 +265,10 @@
             <div class="error-box">
                 <h4>⚠️ 加载失败原因分析</h4>
                 <ul>
-                    <li>网络连接问题：无法访问CDN或阿里云OSS</li>
-                    <li>Ruffle播放器加载失败：CDN链接可能失效</li>
+                    <li>网络连接问题：无法加载Ruffle播放器</li>
                     <li>浏览器兼容性问题：尝试使用Chrome或Firefox</li>
-                    <li>阿里云OSS文件权限问题：确保文件可公开访问</li>
+                    <li>GitHub Pages限制：可能需要添加.nojekyll文件</li>
+                    <li>文件路径问题：确保SWF文件在正确位置</li>
                 </ul>
                 <p>请尝试以下解决方案：</p>
                 <button class="game-btn" id="retryBtn" style="background: linear-gradient(135deg, #ffcc00, #ff9900);">重新加载播放器</button>
@@ -343,7 +277,7 @@
         </div>
         
         <div class="footer">
-            <p>飞鹰武士 1.0 - 经典重现 | 使用Ruffle播放器加载Flash游戏 | 阿里云OSS部署</p>
+            <p>飞鹰武士 1.0 - 经典重现 | 使用Ruffle播放器加载Flash游戏 | GitHub Pages部署</p>
         </div>
     </div>
     
@@ -355,7 +289,8 @@
                 <button onclick="closeVideo()" style="background:#ff3333; color:white; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; font-size:1.2em; box-shadow: 0 3px 10px rgba(0,0,0,0.3);">×</button>
             </div>
             <video id="hiddenVideo" controls style="width:100%; border-radius:10px;">
-                <source src="https://feiying-game.oss-cn-beijing.aliyuncs.com/reward_video.mp4" type="video/mp4">
+                <!-- 使用GitHub Pages托管视频文件 -->
+                <source src="reward_video.mp4" type="video/mp4">
                 您的浏览器不支持视频播放
             </video>
         </div>
@@ -366,11 +301,6 @@
         let rufflePlayer = null;
         let isGameLoaded = false;
         let isVictory = false;
-        
-        // 阿里云OSS资源URL
-        const OSS_BASE_URL = "https://feiying-game.oss-cn-beijing.aliyuncs.com/";
-        const GAME_FILE_URL = OSS_BASE_URL + "feiyingwushi.swf";
-        const REWARD_VIDEO_URL = OSS_BASE_URL + "reward_video.mp4";
         
         // Ruffle播放器CDN备选方案
         const RUFFLE_CDNS = [
@@ -391,9 +321,6 @@
             testBtn.addEventListener('click', testVictory);
             retryBtn.addEventListener('click', retryRuffleLoad);
             refreshBtn.addEventListener('click', () => location.reload());
-            
-            // 设置视频源
-            document.getElementById('hiddenVideo').querySelector('source').src = REWARD_VIDEO_URL;
             
             // 添加游戏说明动画
             animateGameIntro();
@@ -490,11 +417,11 @@
                 }
                 
                 // 更新加载状态
-                loadingText.textContent = '正在从阿里云OSS加载游戏文件...';
+                loadingText.textContent = '正在加载游戏文件...';
                 
-                // 加载游戏文件（使用OSS外链）
+                // 加载游戏文件（使用相对路径）
                 await rufflePlayer.load({
-                    url: GAME_FILE_URL,
+                    url: "feiyingwushi.swf", // 本地SWF文件
                     width: "100%",
                     height: "100%"
                 });
