@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>飞鹰武士 - 阿里云OSS版</title>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle@latest/dist/ruffle.js"></script>
+    <title>飞鹰武士 - 增强版阿里云OSS部署</title>
     <style>
         * {
             margin: 0;
@@ -211,6 +210,31 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* 错误提示 */
+        .error-box {
+            background: rgba(200, 0, 0, 0.3);
+            border: 1px solid #ff3333;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: left;
+        }
+        
+        .error-box h4 {
+            color: #ff6666;
+            margin-bottom: 10px;
+        }
+        
+        .error-box ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .error-box li {
+            margin-bottom: 8px;
+        }
+        
         /* 响应式设计 */
         @media (max-width: 768px) {
             .title {
@@ -257,7 +281,7 @@
     <div class="container">
         <div class="header">
             <h1 class="title">飞鹰武士</h1>
-            <p class="subtitle">经典Flash游戏 - 阿里云OSS部署版</p>
+            <p class="subtitle">经典Flash游戏 - 增强版阿里云OSS部署</p>
         </div>
         
         <div class="game-info">
@@ -303,6 +327,21 @@
             <button class="game-btn" id="testBtn" style="background: linear-gradient(135deg, #52c41a, #389e0d);">测试通关</button>
         </div>
         
+        <div id="errorContainer" style="display: none;">
+            <div class="error-box">
+                <h4>⚠️ 加载失败原因分析</h4>
+                <ul>
+                    <li>网络连接问题：无法访问CDN或阿里云OSS</li>
+                    <li>Ruffle播放器加载失败：CDN链接可能失效</li>
+                    <li>浏览器兼容性问题：尝试使用Chrome或Firefox</li>
+                    <li>阿里云OSS文件权限问题：确保文件可公开访问</li>
+                </ul>
+                <p>请尝试以下解决方案：</p>
+                <button class="game-btn" id="retryBtn" style="background: linear-gradient(135deg, #ffcc00, #ff9900);">重新加载播放器</button>
+                <button class="game-btn" id="refreshBtn" style="background: linear-gradient(135deg, #ff3366, #cc2255); margin-left: 10px;">刷新页面</button>
+            </div>
+        </div>
+        
         <div class="footer">
             <p>飞鹰武士 1.0 - 经典重现 | 使用Ruffle播放器加载Flash游戏 | 阿里云OSS部署</p>
         </div>
@@ -333,20 +372,34 @@
         const GAME_FILE_URL = OSS_BASE_URL + "feiyingwushi.swf";
         const REWARD_VIDEO_URL = OSS_BASE_URL + "reward_video.mp4";
         
+        // Ruffle播放器CDN备选方案
+        const RUFFLE_CDNS = [
+            "https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2024.12.23/ruffle.js",
+            "https://cdn.jsdelivr.net/npm/@ruffle-rs/ruffle@latest/dist/ruffle.js",
+            "https://cdnjs.cloudflare.com/ajax/libs/ruffle/0.1.0-nightly.2024.12.23/ruffle.js"
+        ];
+        
         // ==================== 页面初始化 ====================
         document.addEventListener('DOMContentLoaded', function() {
             const loadBtn = document.getElementById('loadBtn');
             const testBtn = document.getElementById('testBtn');
+            const retryBtn = document.getElementById('retryBtn');
+            const refreshBtn = document.getElementById('refreshBtn');
             const loadingText = document.getElementById('loadingText');
             
             loadBtn.addEventListener('click', loadGame);
             testBtn.addEventListener('click', testVictory);
+            retryBtn.addEventListener('click', retryRuffleLoad);
+            refreshBtn.addEventListener('click', () => location.reload());
             
             // 设置视频源
             document.getElementById('hiddenVideo').querySelector('source').src = REWARD_VIDEO_URL;
             
             // 添加游戏说明动画
             animateGameIntro();
+            
+            // 检查网络连接
+            checkNetwork();
         });
         
         // 游戏介绍动画
@@ -375,6 +428,27 @@
             }, 500);
         }
         
+        // 网络状态检测
+        function checkNetwork() {
+            if (!navigator.onLine) {
+                const loadStatus = document.getElementById('loadStatus');
+                loadStatus.textContent = '❌ 网络连接异常，请检查网络连接';
+                loadStatus.style.color = '#ff6666';
+                
+                const errorContainer = document.getElementById('errorContainer');
+                errorContainer.style.display = 'block';
+                
+                const errorBox = errorContainer.querySelector('.error-box');
+                errorBox.innerHTML = `
+                    <h4>⚠️ 网络连接异常</h4>
+                    <p>检测到您的设备未连接到互联网，请检查网络连接后重试。</p>
+                    <button class="game-btn" onclick="location.reload()" style="background: linear-gradient(135deg, #ffcc00, #ff9900);">
+                        网络恢复后刷新页面
+                    </button>
+                `;
+            }
+        }
+        
         // ==================== 游戏加载函数 ====================
         async function loadGame() {
             const gameScreen = document.getElementById('gameScreen');
@@ -382,16 +456,21 @@
             const loadStatus = document.getElementById('loadStatus');
             const loadingText = document.getElementById('loadingText');
             const overlay = document.querySelector('.game-overlay');
+            const errorContainer = document.getElementById('errorContainer');
             
             loadBtn.disabled = true;
             loadBtn.textContent = '加载中...';
             loadStatus.textContent = '正在加载游戏...';
             loadingText.textContent = '正在初始化游戏引擎...';
+            errorContainer.style.display = 'none';
             
             try {
                 // 检查Ruffle播放器
                 if (!window.RufflePlayer || !window.RufflePlayer.newest) {
-                    throw new Error('Ruffle播放器未加载');
+                    loadingText.textContent = '正在加载Ruffle播放器...';
+                    
+                    // 尝试从多个CDN加载Ruffle
+                    await loadRuffleFromCDN();
                 }
                 
                 // 更新加载状态
@@ -403,10 +482,12 @@
                 gameScreen.appendChild(rufflePlayer);
                 
                 // 隐藏覆盖层
-                overlay.style.opacity = 0;
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                }, 500);
+                if (overlay) {
+                    overlay.style.opacity = 0;
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                    }, 500);
+                }
                 
                 // 更新加载状态
                 loadingText.textContent = '正在从阿里云OSS加载游戏文件...';
@@ -431,16 +512,95 @@
                 }, 2000);
                 
             } catch (error) {
-                console.error('加载失败:', error);
-                loadStatus.textContent = '❌ 游戏加载失败: ' + error.message;
-                loadBtn.textContent = '重新加载';
-                loadBtn.disabled = false;
+                handleLoadError(error);
+            }
+        }
+        
+        // 从多个CDN加载Ruffle播放器
+        async function loadRuffleFromCDN() {
+            return new Promise(async (resolve, reject) => {
+                const loadingText = document.getElementById('loadingText');
+                let loaded = false;
                 
-                // 显示错误信息
+                for (let i = 0; i < RUFFLE_CDNS.length; i++) {
+                    try {
+                        loadingText.textContent = `尝试从CDN源 ${i+1} 加载Ruffle播放器...`;
+                        
+                        await new Promise((cdnResolve, cdnReject) => {
+                            const script = document.createElement('script');
+                            script.src = RUFFLE_CDNS[i];
+                            script.type = 'text/javascript';
+                            
+                            script.onload = () => {
+                                if (window.RufflePlayer && window.RufflePlayer.newest) {
+                                    loaded = true;
+                                    cdnResolve();
+                                } else {
+                                    cdnReject();
+                                }
+                            };
+                            
+                            script.onerror = cdnReject;
+                            
+                            document.head.appendChild(script);
+                        });
+                        
+                        if (loaded) {
+                            resolve();
+                            return;
+                        }
+                    } catch (cdnError) {
+                        console.warn(`CDN源 ${i+1} 加载失败: ${cdnError}`);
+                    }
+                }
+                
+                reject(new Error('所有CDN源加载失败，请检查网络连接'));
+            });
+        }
+        
+        // 重新加载Ruffle播放器
+        async function retryRuffleLoad() {
+            const loadStatus = document.getElementById('loadStatus');
+            const loadingText = document.getElementById('loadingText');
+            const errorContainer = document.getElementById('errorContainer');
+            
+            loadStatus.textContent = '正在尝试重新加载Ruffle播放器...';
+            loadingText.textContent = '正在尝试重新加载Ruffle播放器...';
+            errorContainer.style.display = 'none';
+            
+            try {
+                await loadRuffleFromCDN();
+                loadStatus.textContent = '✅ Ruffle播放器加载成功！请点击"加载游戏"';
+                loadingText.textContent = 'Ruffle播放器加载成功，请点击"加载游戏"按钮';
+            } catch (error) {
+                handleLoadError(error);
+            }
+        }
+        
+        // 处理加载错误
+        function handleLoadError(error) {
+            console.error('加载失败:', error);
+            const loadStatus = document.getElementById('loadStatus');
+            const loadingText = document.getElementById('loadingText');
+            const overlay = document.querySelector('.game-overlay');
+            const errorContainer = document.getElementById('errorContainer');
+            
+            loadStatus.textContent = '❌ 游戏加载失败: ' + error.message;
+            loadingText.innerHTML = `<span style="color:#ff6666;">加载失败: ${error.message}</span>`;
+            
+            // 显示错误信息和解决方案
+            errorContainer.style.display = 'block';
+            
+            // 显示覆盖层
+            if (overlay) {
                 overlay.style.display = 'flex';
                 overlay.style.opacity = 1;
-                loadingText.innerHTML = `<span style="color:#ff6666;">加载失败: ${error.message}</span><br>请检查网络连接后重试`;
             }
+            
+            // 重新启用加载按钮
+            const loadBtn = document.getElementById('loadBtn');
+            loadBtn.textContent = '重新加载';
+            loadBtn.disabled = false;
         }
         
         // ==================== 通关系统 ====================
