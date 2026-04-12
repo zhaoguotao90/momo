@@ -5,350 +5,366 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>飞鹰武士 - 修复版</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            background: #0a0a1a; 
-            color: white; 
-            font-family: Arial, sans-serif; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            padding: 20px; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
         }
         
-        .game-container { 
-            width: 100%; 
-            max-width: 800px; 
-            background: #1a1a2e; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5); 
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         
-        .header { 
-            background: linear-gradient(90deg, #ff6b00, #ffa500); 
-            padding: 20px; 
-            text-align: center; 
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin: 20px 0;
         }
         
-        .header h1 { 
-            color: white; 
-            font-size: 24px; 
-            margin-bottom: 5px; 
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #ffcc00;
         }
         
-        .header p { 
-            color: #ffe0b3; 
-            font-size: 14px; 
+        h1 {
+            font-size: 2.8rem;
+            color: #ffcc00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.7);
+            margin-bottom: 10px;
+            letter-spacing: 2px;
         }
         
-        .game-frame { 
-            width: 100%; 
-            height: 500px; 
-            background: black; 
-            position: relative; 
+        .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-top: 10px;
         }
         
-        #ruffle-container { 
-            width: 100%; 
-            height: 100%; 
+        .game-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border: 5px solid #444;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         }
         
-        .controls { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr; 
-            gap: 10px; 
-            padding: 20px; 
+        #game-frame {
+            width: 100%;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #111;
         }
         
-        .btn { 
-            padding: 15px; 
-            border: none; 
-            border-radius: 8px; 
-            background: linear-gradient(135deg, #3498db, #2980b9); 
-            color: white; 
-            font-size: 16px; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: all 0.3s; 
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
         }
         
-        .btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4); 
+        .btn {
+            padding: 12px 25px;
+            background: linear-gradient(to bottom, #ffcc00, #ff9900);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
         
-        .btn:active { 
-            transform: translateY(0); 
+        .btn:hover {
+            background: linear-gradient(to bottom, #ffdd33, #ffaa33);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
         
-        .btn-orange { 
-            background: linear-gradient(135deg, #ff9800, #f57c00); 
+        .btn:active {
+            transform: translateY(1px);
         }
         
-        .btn-red { 
-            background: linear-gradient(135deg, #e74c3c, #c0392b); 
+        .btn-alt {
+            background: linear-gradient(to bottom, #3498db, #2980b9);
         }
         
-        .btn-green { 
-            background: linear-gradient(135deg, #2ecc71, #27ae60); 
+        .instructions {
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid #ffcc00;
         }
         
-        .status-bar { 
-            padding: 15px; 
-            background: rgba(0,0,0,0.3); 
-            border-top: 1px solid #34495e; 
+        .instructions h2 {
+            color: #ffcc00;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
         }
         
-        .status-text { 
-            text-align: center; 
-            color: #bdc3c7; 
+        .instructions ul {
+            padding-left: 20px;
+            margin: 15px 0;
         }
         
-        .error-box { 
-            display: none; 
-            background: rgba(231, 76, 60, 0.1); 
-            border-left: 4px solid #e74c3c; 
-            padding: 15px; 
-            margin: 15px; 
-            border-radius: 4px; 
+        .instructions li {
+            margin-bottom: 10px;
+            line-height: 1.6;
         }
         
-        .loader { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 300px; 
+        .key {
+            display: inline-block;
+            background: #333;
+            color: #ffcc00;
+            padding: 3px 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin: 0 3px;
+            border: 1px solid #555;
         }
         
-        .spinner { 
-            width: 50px; 
-            height: 50px; 
-            border: 5px solid rgba(255,255,255,0.1); 
-            border-top: 5px solid #ff9800; 
-            border-radius: 50%; 
-            animation: spin 1s linear infinite; 
-            margin-bottom: 20px; 
+        .status {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(30, 30, 30, 0.8);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            flex-wrap: wrap;
         }
         
-        @keyframes spin { 
-            0% { transform: rotate(0deg); } 
-            100% { transform: rotate(360deg); } 
+        .status-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            margin: 5px 0;
         }
         
-        .mobile-warning { 
-            background: #f39c12; 
-            color: #fff; 
-            padding: 10px; 
-            text-align: center; 
-            font-size: 14px; 
+        .status-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #ffcc00;
+            margin-top: 5px;
         }
         
-        @media (max-width: 600px) { 
-            .game-frame { height: 400px; } 
-            .controls { grid-template-columns: 1fr; } 
+        .loader {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #ffcc00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-box {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .compatibility {
+            background: rgba(52, 152, 219, 0.2);
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #444;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            #game-frame {
+                height: 400px;
+            }
+            
+            .status {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            #game-frame {
+                height: 300px;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <h1>🦅 飞鹰武士</h1>
-            <p>经典Flash动作游戏 - 增强版加载器</p>
-        </div>
+    <div class="container">
+        <header>
+            <h1>飞鹰武士</h1>
+            <p class="subtitle">经典Flash动作游戏 - 优化加载版</p>
+        </header>
         
-        <div class="mobile-warning" id="mobile-warning">
-            📱 手机用户提示：如加载缓慢，请尝试使用Chrome浏览器或刷新页面
-        </div>
-        
-        <div class="error-box" id="error-box">
-            <strong>⚠️ 加载错误：</strong>
-            <p id="error-message"></p>
-            <button class="btn btn-red" onclick="retryLoad()" style="margin-top: 10px;">重试加载</button>
-        </div>
-        
-        <div class="game-frame">
-            <div id="ruffle-container">
-                <!-- 加载动画 -->
+        <div class="game-container">
+            <div id="game-frame">
                 <div class="loader" id="loader">
                     <div class="spinner"></div>
-                    <p id="loading-text">正在加载Ruffle模拟器...</p>
-                    <p id="progress-text" style="font-size: 12px; margin-top: 10px;"></p>
+                    <p id="loading-text">正在初始化游戏环境...</p>
+                    <p id="progress-text">进度: 0%</p>
                 </div>
             </div>
         </div>
         
-        <div class="controls">
-            <button class="btn btn-green" onclick="startGame()">▶ 开始游戏</button>
-            <button class="btn" onclick="toggleFullscreen()">📺 全屏模式</button>
-            <button class="btn btn-orange" onclick="restartGame()">🔄 重新开始</button>
-            <button class="btn btn-red" onclick="reloadRuffle()">🔄 重新加载模拟器</button>
-        </div>
-        
-        <div class="status-bar">
-            <div class="status-text">
-                <span id="status">状态: 初始化中...</span> | 
-                <span id="version">Ruffle版本: 加载中...</span>
+        <div class="error-box" id="error-box">
+            <h3>⚠️ 加载错误</h3>
+            <p id="error-message"></p>
+            <div class="controls" style="margin-top: 15px;">
+                <button class="btn" onclick="retryLoad()">重试加载</button>
+                <button class="btn btn-alt" onclick="changeRuffleVersion()">更换模拟器版本</button>
             </div>
         </div>
         
-        <div style="padding: 15px; background: rgba(0,0,0,0.2); font-size: 12px; color: #95a5a6;">
-            <p>💡 提示：如果加载失败，请尝试：</p>
-            <ol style="margin-left: 20px; margin-top: 5px;">
-                <li>使用Chrome浏览器访问</li>
+        <div class="compatibility">
+            <h3>兼容性提示</h3>
+            <p>如果游戏无法加载，请尝试：</p>
+            <ul>
+                <li>使用 Chrome 或 Edge 浏览器</li>
                 <li>刷新页面并等待30秒</li>
-                <li>点击"重新加载模拟器"按钮</li>
-                <li>检查网络连接</li>
-            </ol>
+                <li>点击"重试加载"按钮</li>
+                <li>确保网络连接正常</li>
+            </ul>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" id="start-btn">开始游戏</button>
+            <button class="btn" id="fullscreen-btn">全屏模式</button>
+            <button class="btn" id="restart-btn">重新开始</button>
+        </div>
+        
+        <div class="instructions">
+            <h2>游戏说明</h2>
+            <p>《飞鹰武士》是一款经典的横向卷轴动作游戏，玩家扮演一名身手矫健的武士，在充满挑战的关卡中击败敌人。</p>
+            
+            <h3>操作方式：</h3>
+            <ul>
+                <li>移动：<span class="key">←</span> <span class="key">→</span> 方向键</li>
+                <li>跳跃：<span class="key">↑</span> 方向键或 <span class="key">空格键</span></li>
+                <li>攻击：<span class="key">Z</span> 键或 <span class="key">X</span> 键</li>
+                <li>特殊技能：<span class="key">C</span> 键</li>
+                <li>暂停游戏：<span class="key">P</span> 键</li>
+            </ul>
+        </div>
+        
+        <div class="status">
+            <div class="status-item">
+                <div>游戏状态</div>
+                <div class="status-value" id="game-status">初始化中</div>
+            </div>
+            <div class="status-item">
+                <div>模拟器版本</div>
+                <div class="status-value" id="ruffle-version">加载中...</div>
+            </div>
+            <div class="status-item">
+                <div>加载进度</div>
+                <div class="status-value" id="load-progress">0%</div>
+            </div>
         </div>
     </div>
     
-    <!-- 使用更稳定的Ruffle版本 -->
-    <script src="https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.10.31/ruffle.js"></script>
-    
+    <footer>
+        <p>© 2023 飞鹰武士游戏测试页面 | 使用Ruffle模拟器运行Flash内容</p>
+        <p>注意：此页面仅用于测试目的，游戏版权归原作者所有</p>
+    </footer>
+
+    <!-- 多重加载机制：尝试多个Ruffle版本 -->
     <script>
         // 游戏状态变量
-        let ruffle = null;
-        let player = null;
+        let rufflePlayer = null;
         let isGameLoaded = false;
         let loadAttempts = 0;
         const MAX_ATTEMPTS = 3;
         
-        // 加载状态
-        const loadStates = [
-            "初始化Ruffle模拟器...",
-            "加载核心模块...",
-            "准备游戏环境...",
-            "加载游戏文件...",
-            "游戏资源处理中..."
+        // 可用的Ruffle版本列表
+        const RUFFLE_VERSIONS = [
+            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.12.31/ruffle.js',
+            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.11.30/ruffle.js',
+            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.10.31/ruffle.js',
+            'https://unpkg.com/@ruffle-rs/ruffle@0.1.0-nightly.2023.09.30/ruffle.js'
         ];
-        let currentState = 0;
+        
+        // 游戏文件路径列表
+        const GAME_PATHS = [
+            'feiyingwushi.swf',
+            './feiyingwushi.swf',
+            'https://raw.githubusercontent.com/zhaoguotao90/momo/main/feiyingwushi.swf'
+        ];
         
         // 更新加载状态
-        function updateLoadState() {
-            const textElement = document.getElementById('loading-text');
-            const progressElement = document.getElementById('progress-text');
-            
-            if (currentState < loadStates.length) {
-                textElement.textContent = loadStates[currentState];
-                progressElement.textContent = `进度: ${Math.round((currentState + 1) / loadStates.length * 100)}%`;
-                currentState++;
-                
-                if (currentState < loadStates.length) {
-                    setTimeout(updateLoadState, 2000);
-                } else {
-                    textElement.textContent = "加载超时，正在尝试修复...";
-                    setTimeout(checkRuffleLoad, 1000);
-                }
-            }
-        }
-        
-        // 检查Ruffle是否加载
-        function checkRuffleLoad() {
-            if (typeof window.RufflePlayer === 'undefined') {
-                loadAttempts++;
-                if (loadAttempts < MAX_ATTEMPTS) {
-                    showError(`Ruffle模拟器加载失败 (尝试 ${loadAttempts}/${MAX_ATTEMPTS})，正在重试...`);
-                    setTimeout(initRuffle, 3000);
-                } else {
-                    showError("Ruffle模拟器加载失败，请刷新页面或更换浏览器");
-                }
-                return false;
-            }
-            return true;
-        }
-        
-        // 初始化Ruffle
-        function initRuffle() {
-            if (!checkRuffleLoad()) return;
-            
-            try {
-                document.getElementById('loading-text').textContent = "Ruffle加载成功，正在初始化游戏...";
-                
-                ruffle = window.RufflePlayer.newest();
-                document.getElementById('version').textContent = `Ruffle版本: ${ruffle.version}`;
-                
-                player = ruffle.createPlayer();
-                const container = document.getElementById('ruffle-container');
-                
-                // 清空加载动画
-                const loader = document.getElementById('loader');
-                if (loader) {
-                    loader.style.display = 'none';
-                }
-                
-                // 配置播放器
-                player.style.width = '100%';
-                player.style.height = '100%';
-                player.style.display = 'block';
-                container.appendChild(player);
-                
-                // 加载游戏
-                loadGame();
-                
-            } catch (error) {
-                showError(`Ruffle初始化失败: ${error.message}`);
-                console.error("Ruffle初始化错误:", error);
-            }
-        }
-        
-        // 加载游戏
-        function loadGame() {
-            if (!player) {
-                showError("播放器未初始化");
-                return;
-            }
-            
-            document.getElementById('status').textContent = "状态: 加载游戏文件中...";
-            
-            // 尝试从多个可能的路径加载游戏
-            const gamePaths = [
-                'feiyingwushi.swf',
-                './feiyingwushi.swf',
-                'https://raw.githubusercontent.com/zhaoguotao90/momo/main/feiyingwushi.swf'
-            ];
-            
-            let currentPathIndex = 0;
-            
-            function tryLoadPath() {
-                if (currentPathIndex >= gamePaths.length) {
-                    showError("无法加载游戏文件，请确保feiyingwushi.swf文件存在");
-                    return;
-                }
-                
-                const gamePath = gamePaths[currentPathIndex];
-                document.getElementById('loading-text').textContent = `尝试从路径加载: ${gamePath}`;
-                
-                player.load(gamePath)
-                    .then(() => {
-                        document.getElementById('status').textContent = "状态: 游戏加载成功";
-                        isGameLoaded = true;
-                        document.getElementById('loading-text').textContent = "✅ 游戏加载完成！点击开始游戏按钮";
-                        console.log("游戏加载成功");
-                    })
-                    .catch(error => {
-                        console.warn(`从 ${gamePath} 加载失败:`, error);
-                        currentPathIndex++;
-                        
-                        if (currentPathIndex < gamePaths.length) {
-                            setTimeout(tryLoadPath, 1000);
-                        } else {
-                            showError(`游戏加载失败: ${error.message}`);
-                        }
-                    });
-            }
-            
-            tryLoadPath();
+        function updateLoadStatus(message, progress) {
+            document.getElementById('loading-text').textContent = message;
+            document.getElementById('progress-text').textContent = `进度: ${progress}%`;
+            document.getElementById('load-progress').textContent = `${progress}%`;
+            document.getElementById('game-status').textContent = message;
         }
         
         // 显示错误
         function showError(message) {
-            console.error("错误:", message);
             document.getElementById('error-message').textContent = message;
             document.getElementById('error-box').style.display = 'block';
-            document.getElementById('status').textContent = "状态: 加载失败";
+            console.error(message);
         }
         
         // 隐藏错误
@@ -356,39 +372,124 @@
             document.getElementById('error-box').style.display = 'none';
         }
         
+        // 加载Ruffle模拟器
+        function loadRuffle(versionIndex = 0) {
+            if (versionIndex >= RUFFLE_VERSIONS.length) {
+                showError('所有Ruffle版本加载失败，请刷新页面或更换浏览器');
+                return;
+            }
+            
+            const versionUrl = RUFFLE_VERSIONS[versionIndex];
+            updateLoadStatus(`正在加载Ruffle模拟器 (版本 ${versionIndex + 1}/${RUFFLE_VERSIONS.length})`, 20);
+            
+            const script = document.createElement('script');
+            script.src = versionUrl;
+            
+            script.onload = function() {
+                try {
+                    const ruffle = window.RufflePlayer.newest();
+                    document.getElementById('ruffle-version').textContent = ruffle.version;
+                    initializePlayer(ruffle);
+                } catch (error) {
+                    console.error('Ruffle初始化失败:', error);
+                    loadRuffle(versionIndex + 1);
+                }
+            };
+            
+            script.onerror = function() {
+                console.warn(`Ruffle版本 ${versionUrl} 加载失败`);
+                loadRuffle(versionIndex + 1);
+            };
+            
+            document.head.appendChild(script);
+        }
+        
+        // 初始化游戏播放器
+        function initializePlayer(ruffle) {
+            updateLoadStatus('正在初始化游戏播放器', 40);
+            
+            try {
+                rufflePlayer = ruffle.createPlayer();
+                const gameFrame = document.getElementById('game-frame');
+                
+                // 移除加载动画
+                const loader = document.getElementById('loader');
+                if (loader) {
+                    loader.remove();
+                }
+                
+                // 设置播放器样式
+                rufflePlayer.style.width = '100%';
+                rufflePlayer.style.height = '100%';
+                gameFrame.appendChild(rufflePlayer);
+                
+                // 加载游戏文件
+                loadGameFile();
+            } catch (error) {
+                console.error('播放器创建失败:', error);
+                showError(`播放器创建失败: ${error.message}`);
+            }
+        }
+        
+        // 加载游戏文件
+        function loadGameFile(pathIndex = 0) {
+            if (pathIndex >= GAME_PATHS.length) {
+                showError('无法加载游戏文件，请确保文件存在');
+                return;
+            }
+            
+            const gamePath = GAME_PATHS[pathIndex];
+            updateLoadStatus(`正在加载游戏文件 (尝试 ${pathIndex + 1}/${GAME_PATHS.length})`, 60 + pathIndex * 10);
+            
+            rufflePlayer.load(gamePath)
+                .then(() => {
+                    updateLoadStatus('游戏加载完成', 100);
+                    isGameLoaded = true;
+                    
+                    // 添加事件监听器
+                    document.getElementById('start-btn').addEventListener('click', startGame);
+                    document.getElementById('restart-btn').addEventListener('click', restartGame);
+                    document.getElementById('fullscreen-btn').addEventListener('click', toggleFullscreen);
+                })
+                .catch(error => {
+                    console.warn(`从 ${gamePath} 加载失败:`, error);
+                    loadGameFile(pathIndex + 1);
+                });
+        }
+        
         // 开始游戏
         function startGame() {
-            if (isGameLoaded && player) {
+            if (rufflePlayer && isGameLoaded) {
                 try {
-                    player.play();
-                    document.getElementById('status').textContent = "状态: 游戏中";
+                    rufflePlayer.play();
+                    document.getElementById('game-status').textContent = '运行中';
                 } catch (error) {
                     showError(`开始游戏失败: ${error.message}`);
                 }
             } else {
-                showError("游戏尚未加载完成，请稍候...");
+                showError('游戏尚未加载完成，请稍候...');
             }
         }
         
         // 重新开始游戏
         function restartGame() {
-            if (isGameLoaded && player) {
+            if (rufflePlayer && isGameLoaded) {
                 try {
-                    player.restart();
-                    document.getElementById('status').textContent = "状态: 重新开始";
+                    rufflePlayer.restart();
+                    document.getElementById('game-status').textContent = '重新开始';
                 } catch (error) {
                     showError(`重新开始失败: ${error.message}`);
                 }
             } else {
-                showError("游戏未加载");
+                showError('游戏未加载');
             }
         }
         
         // 切换全屏
         function toggleFullscreen() {
-            if (player && isGameLoaded) {
+            if (rufflePlayer && isGameLoaded) {
                 try {
-                    player.fullscreen();
+                    rufflePlayer.fullscreen();
                 } catch (error) {
                     // 如果播放器不支持全屏，则尝试容器全屏
                     const container = document.querySelector('.game-container');
@@ -404,89 +505,70 @@
             }
         }
         
-        // 重新加载Ruffle
-        function reloadRuffle() {
-            location.reload();
-        }
-        
         // 重试加载
         function retryLoad() {
             hideError();
-            isGameLoaded = false;
-            currentState = 0;
-            loadAttempts = 0;
+            loadAttempts++;
             
-            const container = document.getElementById('ruffle-container');
-            container.innerHTML = '';
-            
-            const loader = document.createElement('div');
-            loader.className = 'loader';
-            loader.innerHTML = `
-                <div class="spinner"></div>
-                <p id="loading-text">重新加载中...</p>
-                <p id="progress-text" style="font-size: 12px; margin-top: 10px;"></p>
-            `;
-            container.appendChild(loader);
-            
-            document.getElementById('status').textContent = "状态: 重新加载中...";
-            
-            // 重新初始化
-            setTimeout(() => {
-                initRuffle();
-                updateLoadState();
-            }, 500);
-        }
-        
-        // 页面加载完成
-        document.addEventListener('DOMContentLoaded', function() {
-            // 检查是否移动设备
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile) {
-                document.getElementById('mobile-warning').style.display = 'block';
-                
-                // 移动设备特殊处理
-                setTimeout(function() {
-                    if (!isGameLoaded) {
-                        document.getElementById('mobile-warning').innerHTML = 
-                            '📱 手机加载较慢，建议:<br>1. 使用Chrome浏览器<br>2. 连接WiFi网络<br>3. 耐心等待30秒';
-                    }
-                }, 10000);
+            if (loadAttempts >= MAX_ATTEMPTS) {
+                showError('多次尝试失败，请刷新页面或更换浏览器');
+                return;
             }
             
-            // 开始加载流程
-            updateLoadState();
+            // 重新初始化游戏
+            document.getElementById('game-frame').innerHTML = `
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                    <p id="loading-text">正在重试加载 (尝试 ${loadAttempts}/${MAX_ATTEMPTS})</p>
+                    <p id="progress-text">进度: 0%</p>
+                </div>
+            `;
             
-            // 延迟初始化Ruffle，确保页面完全加载
-            setTimeout(initRuffle, 1000);
+            document.getElementById('game-status').textContent = '重试中';
+            document.getElementById('load-progress').textContent = '0%';
+            
+            // 重新加载
+            setTimeout(loadRuffle, 500);
+        }
+        
+        // 更换模拟器版本
+        function changeRuffleVersion() {
+            hideError();
+            document.getElementById('game-frame').innerHTML = `
+                <div class="loader" id="loader">
+                    <div class="spinner"></div>
+                    <p id="loading-text">正在更换模拟器版本...</p>
+                    <p id="progress-text">进度: 0%</p>
+                </div>
+            `;
+            
+            // 重新加载
+            setTimeout(loadRuffle, 500);
+        }
+        
+        // 键盘控制
+        document.addEventListener('keydown', function(e) {
+            if (e.key === ' ') { // 空格键
+                startGame();
+            } else if (e.key === 'r' || e.key === 'R') {
+                restartGame();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFullscreen();
+            }
+        });
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 开始加载流程
+            updateLoadStatus('正在准备游戏环境', 10);
+            setTimeout(loadRuffle, 1000);
             
             // 设置超时检测
             setTimeout(function() {
                 if (!isGameLoaded) {
-                    document.getElementById('loading-text').textContent = "加载时间较长，正在尝试优化...";
-                    
-                    // 尝试使用备用加载方法
-                    if (typeof window.RufflePlayer !== 'undefined' && !player) {
-                        initRuffle();
-                    }
+                    updateLoadStatus('加载时间较长，请耐心等待...', 75);
                 }
-            }, 15000);
-        });
-        
-        // 键盘快捷键
-        document.addEventListener('keydown', function(e) {
-            if (e.key === ' ' || e.key === 'Spacebar') { // 空格键
-                e.preventDefault();
-                startGame();
-            } else if (e.key === 'r' || e.key === 'R') { // R键
-                restartGame();
-            } else if (e.key === 'f' || e.key === 'F') { // F键
-                toggleFullscreen();
-            } else if (e.key === 'Escape') { // ESC键
-                if (document.fullscreenElement) {
-                    document.exitFullscreen();
-                }
-            }
+            }, 10000);
         });
     </script>
 </body>
