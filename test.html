@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>拳皇KOF7K - Base64分块加载版</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #000; 
+            color: #fff; 
+            font-family: "Microsoft Yahei", sans-serif; 
+            overflow: hidden; 
+            touch-action: none; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        
+        .header { 
+            padding: 15px; 
+            text-align: center; 
+            background: linear-gradient(135deg, #8B0000, #B22222); 
+            border-bottom: 3px solid #ffcc00; 
+        }
+        
+        .title { 
+            font-size: 2.5rem; 
+            color: #ffcc00; 
+            margin-bottom: 5px; 
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5); 
+        }
+        
+        .subtitle { 
+            color: #4cdfff; 
+            font-size: 1.2rem; 
+        }
+        
+        #game-container { 
+            flex: 1; 
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+        }
+        
+        #loading-overlay { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0, 0, 0, 0.95); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 1000; 
+        }
+        
+        .loader { 
+            width: 50px; 
+            height: 50px; 
+            border: 5px solid rgba(255, 255, 255, 0.2); 
+            border-radius: 50%; 
+            border-top: 5px solid #ff3333; 
+            animation: spin 1s linear infinite; 
+            margin-bottom: 20px; 
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        
+        #loading-text { 
+            color: #fff; 
+            font-size: 1.2rem; 
+            text-align: center; 
+            margin-bottom: 20px; 
+        }
+        
+        #progress-bar { 
+            width: 80%; 
+            height: 6px; 
+            background: #333; 
+            border-radius: 3px; 
+            overflow: hidden; 
+            margin: 20px 0; 
+        }
+        
+        #progress-fill { 
+            height: 100%; 
+            width: 0%; 
+            background: linear-gradient(90deg, #52c41a, #a0d911); 
+            transition: width 0.3s; 
+        }
+        
+        #error-message { 
+            display: none; 
+            background: rgba(200, 0, 0, 0.7); 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin-top: 15px; 
+            text-align: center; 
+            max-width: 80%; 
+        }
+        
+        .controls { 
+            padding: 10px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 10px; 
+            background: rgba(0, 0, 0, 0.8); 
+            border-top: 1px solid #333; 
+        }
+        
+        .control-btn { 
+            background: linear-gradient(to bottom, #444, #222); 
+            color: #fff; 
+            border: none; 
+            border-radius: 4px; 
+            padding: 8px 15px; 
+            font-size: 0.9rem; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+        }
+        
+        .control-btn:hover { 
+            background: linear-gradient(to bottom, #555, #333); 
+        }
+        
+        #reward-video { 
+            display: none; 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; 
+            background: #000; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            z-index: 999; 
+        }
+        
+        #close-btn { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            z-index: 1000; 
+            background: #ff4444; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">拳皇KOF7K 终极版</h1>
+        <p class="subtitle">Base64分块加载技术 - 完美解决部署限制</p>
+    </div>
+    
+    <div id="game-container">
+        <div id="loading-overlay">
+            <div class="loader"></div>
+            <div id="loading-text">正在初始化游戏引擎...</div>
+            <div id="progress-bar">
+                <div id="progress-fill"></div>
+            </div>
+            <div id="error-message"></div>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <button class="control-btn" id="reload-btn">🔄 重新加载</button>
+        <button class="control-btn" id="volume-btn">🔊 音量开关</button>
+    </div>
+    
+    <video id="reward-video" controls playsinline>
+        <source src="reward_video.mp4" type="video/mp4">
+    </video>
+    
+    <button id="close-btn">返回游戏</button>
+
+    <script src="ruffle.js"></script>
+    <script>
+        // 配置
+        const TOTAL_PARTS = 11; // 修改为实际分块数量
+        const GAME_WIDTH = 800;
+        const GAME_HEIGHT = 600;
+        
+        // DOM元素
+        const gameContainer = document.getElementById('game-container');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingText = document.getElementById('loading-text');
+        const progressBar = document.getElementById('progress-fill');
+        const errorMessage = document.getElementById('error-message');
+        const reloadBtn = document.getElementById('reload-btn');
+        const volumeBtn = document.getElementById('volume-btn');
+        const rewardVideo = document.getElementById('reward-video');
+        const closeBtn = document.getElementById('close-btn');
+        
+        let rufflePlayer = null;
+        let isMuted = false;
+        
+        // 更新进度
+        function updateProgress(percent, message) {
+            progressBar.style.width = percent + '%';
+            if (message) {
+                loadingText.textContent = `${message} (${Math.round(percent)}%)`;
+            }
+        }
+        
+        // 加载分块文件
+        async function loadGameParts() {
+            let base64Data = '';
+            
+            for (let i = 1; i <= TOTAL_PARTS; i++) {
+                try {
+                    updateProgress(((i - 1) / TOTAL_PARTS) * 100, `正在加载分块 ${i}/${TOTAL_PARTS}`);
+                    
+                    const response = await fetch(`game_part_${i}.b64`);
+                    if (!response.ok) {
+                        throw new Error(`无法加载分块 ${i}: ${response.statusText}`);
+                    }
+                    
+                    const text = await response.text();
+                    base64Data += text;
+                    
+                } catch (error) {
+                    throw new Error(`分块 ${i} 加载失败: ${error.message}`);
+                }
+            }
+            
+            return base64Data;
+        }
+        
+        // Base64转Uint8Array
+        function base64ToUint8Array(base64) {
+            try {
+                const binaryString = atob(base64);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                return bytes;
+            } catch (error) {
+                throw new Error('Base64解码失败: ' + error.message);
+            }
+        }
+        
+        // 主加载函数
+        async function loadGame() {
+            try {
+                // 阶段1: 加载Ruffle
+                updateProgress(10, '正在加载Flash播放器');
+                
+                if (!window.RufflePlayer) {
+                    throw new Error('Ruffle播放器加载失败');
+                }
+                
+                // 阶段2: 加载分块文件
+                updateProgress(20, '开始加载游戏分块');
+                const base64Data = await loadGameParts();
+                updateProgress(70, '游戏分块加载完成');
+                
+                // 阶段3: 解码Base64
+                updateProgress(80, '正在解码游戏数据');
+                const uint8Array = base64ToUint8Array(base64Data);
+                
+                // 阶段4: 初始化Ruffle播放器
+                updateProgress(90, '正在初始化游戏');
+                
+                const ruffle = window.RufflePlayer.newest();
+                rufflePlayer = ruffle.createPlayer();
+                
+                // 设置播放器样式
+                rufflePlayer.style.width = '100%';
+                rufflePlayer.style.height = '100%';
+                rufflePlayer.style.maxWidth = `${GAME_WIDTH}px`;
+                rufflePlayer.style.maxHeight = `${GAME_HEIGHT}px`;
+                rufflePlayer.style.margin = '0 auto';
+                
+                // 清空容器并添加播放器
+                gameContainer.innerHTML = '';
+                gameContainer.appendChild(rufflePlayer);
+                
+                // 阶段5: 加载游戏
+                await rufflePlayer.load({
+                    data: uint8Array.buffer,
+                    autoplay: 'on',
+                    unmuteOverlay: 'visible',
+                    backgroundColor: '#000000',
+                    wmode: 'direct',
+                    letterbox: 'on',
+                    openInNewTab: false
+                });
+                
+                // 阶段6: 加载完成
+                updateProgress(100, '游戏加载完成');
+                
+                // 淡出加载界面
+                setTimeout(() => {
+                    loadingOverlay.style.opacity = '0';
+                    setTimeout(() => {
+                        loadingOverlay.style.display = 'none';
+                    }, 500);
+                }, 1000);
+                
+                console.log('游戏加载成功！');
+                
+            } catch (error) {
+                console.error('加载失败:', error);
+                showError(error.message);
+            }
+        }
+        
+        // 显示错误
+        function showError(message) {
+            loadingText.textContent = '加载失败';
+            errorMessage.textContent = `错误: ${message}`;
+            errorMessage.style.display = 'block';
+            reloadBtn.style.display = 'inline-block';
+        }
+        
+        // 显示通关视频
+        function showRewardVideo() {
+            gameContainer.style.display = 'none';
+            rewardVideo.style.display = 'block';
+            closeBtn.style.display = 'block';
+            rewardVideo.play().catch(e => {
+                console.log('视频自动播放失败，需要用户交互');
+            });
+        }
+        
+        // 返回游戏
+        function backToGame() {
+            rewardVideo.style.display = 'none';
+            closeBtn.style.display = 'none';
+            rewardVideo.pause();
+            gameContainer.style.display = 'flex';
+        }
+        
+        // 切换音量
+        function toggleVolume() {
+            isMuted = !isMuted;
+            if (rufflePlayer) {
+                rufflePlayer.muted = isMuted;
+            }
+            volumeBtn.textContent = isMuted ? '🔇 取消静音' : '🔊 静音';
+        }
+        
+        // 事件监听
+        reloadBtn.addEventListener('click', () => {
+            loadingOverlay.style.display = 'flex';
+            loadingOverlay.style.opacity = '1';
+            errorMessage.style.display = 'none';
+            loadGame();
+        });
+        
+        volumeBtn.addEventListener('click', toggleVolume);
+        closeBtn.addEventListener('click', backToGame);
+        
+        // 键盘快捷键
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && rewardVideo.style.display === 'block') {
+                backToGame();
+            }
+            if (e.key === ' ' && rufflePlayer) {
+                // 空格键测试通关视频
+                showRewardVideo();
+            }
+        });
+        
+        // 页面加载完成后开始
+        window.addEventListener('DOMContentLoaded', loadGame);
+        
+        // 错误处理
+        window.addEventListener('error', (event) => {
+            console.error('全局错误:', event.error);
+            showError(event.error?.message || '未知错误');
+        });
+    </script>
+</body>
+</html>
